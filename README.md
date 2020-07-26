@@ -1,1 +1,1 @@
-# cuda---lattice-Boltzmann---Shan-Chen
+# Lattice Boltzmann Shan Chen two phase flow simulation
