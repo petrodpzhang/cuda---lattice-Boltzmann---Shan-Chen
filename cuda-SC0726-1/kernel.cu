@@ -400,9 +400,9 @@ __global__ void stream(double* __restrict__ d_f_1, double* __restrict__ d_f_2, d
     
     for (int q = 0; q < 19; q++)
     {
-        int i_1 = threadIdx.x + blockIdx.x * blockDim.x + cx[q];
-        int j_1 = threadIdx.y + blockIdx.y * blockDim.y + cy[q];
-        int k_1 = threadIdx.z + blockIdx.z * blockDim.z + cz[q];
+        int i_1 = (i + cx[q] + Nx) % Nx;
+        int j_1 = (j + cy[q] + Ny) % Ny;
+        int k_1 = (k + cz[q] + Nz) % Nz;
         indexf[q] = k_1 * Nx * Ny + j_1 * Nx + i_1;
     }
 
@@ -513,7 +513,7 @@ __global__ void stream(double* __restrict__ d_f_1, double* __restrict__ d_f_2, d
 int main()
 {
 
-    const int Nstep = 1000;
+    const int Nstep = 5000;
     
     // allocate memory on CPU and GPU 
     h_ux = (double*)malloc(sizeof(double) * Nlattice);
@@ -572,22 +572,34 @@ int main()
         cudaDeviceSynchronize();
     }
     
-    cudaMemcpy(test, d_ux, Nx * Ny * Nz * sizeof(double), cudaMemcpyDeviceToHost);///////////////////////////////////////test
+    cudaMemcpy(test, d_rho_1, Nx * Ny * Nz * sizeof(double), cudaMemcpyDeviceToHost);///////////////////////////////////////test
 
     for (int z = 0; z < Nz; z++)//////////////////////////////////////////////////////test
     {
-        cout << "z=" << z << endl;
         for (int y = 0; y < Ny; y++)
         {
-            cout << "y=" << y << endl;
+            
             for (int x = 0; x < Nx; x++)
             {
-                const int k = z * Nx * Ny + y * Nx + x;
-                cout << test[k] << " ";
-            }cout << endl;
-        }cout << endl;
-    }cout << endl;
+                int k = z * Nx * Ny + y * Nx + x;
+                cout << x+1 << "\t" << y+1 << "\t " << z+1 << "\t " << test[k] << endl;
+            }
+        }
+    }
 
+    //for (int z = 0; z < Nz; z++)//////////////////////////////////////////////////////test
+    //{
+    //    cout << "z=" << z << endl;
+    //    for (int y = 0; y < Ny; y++)
+    //    {
+    //        cout << "y=" << y << endl;
+    //        for (int x = 0; x < Nx; x++)
+    //        {
+    //            const int k = z * Nx * Ny + y * Nx + x;
+    //            cout << test[k] << " ";
+    //        }cout << endl;
+    //    }cout << endl;
+    //}cout << endl;
 
     free(h_f_1);
     free(h_f_2);
